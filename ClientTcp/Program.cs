@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -12,6 +13,10 @@ namespace ClientTcp
     {
         static void Main(string[] args)
         {
+
+
+            Console.WriteLine(Test().Length);
+
             const string ip = "127.0.0.1";
             const int port = 8080;
 
@@ -24,14 +29,16 @@ namespace ClientTcp
             Console.WriteLine("Введите сообщение");
             var message = Console.ReadLine();
 
+            //byte[] test = Test();
+            
             //кодируем в байты сообщение message
             var data = Encoding.UTF8.GetBytes(message);
             //подключаемся к серверу по ip;
             tcpSocket.Connect(tcpEndPoint);
             //отправляем сообщение
-            tcpSocket.Send(data);
+            tcpSocket.Send(Test());
 
-            var buffer = new byte[256];
+            var buffer = new byte[1463414];
             //колличество реально полученных байт
             var size = 0;
             //собирает данные
@@ -53,6 +60,16 @@ namespace ClientTcp
             tcpSocket.Close();
 
             Console.ReadLine();
+        }
+
+        static byte[] Test()
+        {
+            Image image = Image.FromFile(@"D:\1.jpeg");
+            System.IO.MemoryStream memoryStream = new System.IO.MemoryStream();
+            image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+            byte[] b = memoryStream.ToArray();
+
+            return b;
         }
     }
 }

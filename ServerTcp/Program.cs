@@ -10,12 +10,57 @@ namespace ServerTcp
 {
     class Program
     {
+
         //https://www.youtube.com/watch?v=ZRGgBtUgJKE;
         static void Main(string[] args)
         {
             const string ip = "127.0.0.1";
             const int port = 8080;
+
+            //Задаем параметры ip и порт
+            var udpEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
+
+            //0 - использование ipv4, 1 -,2 протокол tcp
+            var udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+            udpSocket.Bind(udpEndPoint);
             
+            while(true)
+            {
+                var buffer = new byte[256];
+                //колличество реально полученных байт
+                var size = 0;
+                //собирает данные
+                var data = new StringBuilder();
+                EndPoint senderEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                do
+                {
+                    //будет сохранен адрес клиента
+                   
+                    size = udpSocket.ReceiveFrom(buffer, ref senderEndPoint);
+                    data.Append(Encoding.UTF8.GetString(buffer));
+                }
+                while (udpSocket.Available > 0);
+
+                udpSocket.SendTo(Encoding.UTF8.GetBytes("Сообщение получено"),senderEndPoint);
+
+                Console.WriteLine(data);
+                Console.ReadLine();               
+                
+            }
+
+            
+
+
+
+
+        }
+        public void TCPserver()
+        {
+           
+            const string ip = "127.0.0.1";
+            const int port = 8080;
+
             //Задаем параметры ip и порт
             var tcpEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
 
@@ -26,7 +71,9 @@ namespace ServerTcp
             //Сколько клиентов может быть подключено
             tcpSocket.Listen(5);
 
-            while(true)
+
+
+            while (true)
             {
                 //подсокет для обрабатывания клиента обрабатывает данные и уничтожается и по новой для следующего клиента.
                 var listener = tcpSocket.Accept();
@@ -55,10 +102,9 @@ namespace ServerTcp
 
                 Console.ReadLine();
 
-
-
+                
             }
-
         }
     }
+        
 }
